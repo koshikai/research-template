@@ -1,0 +1,46 @@
+\documentclass[article,paper=a4,fontsize=10pt,twocolumn,column_gap=2zw]{jlreq}
+
+% Packages
+\usepackage{luatexja}
+\usepackage[top=20mm,bottom=20mm,left=15mm,right=15mm]{geometry}
+\usepackage{amsmath, amssymb}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{cite}
+
+% ページ設定の微調整
+\pagestyle{empty}
+
+\begin{document}
+
+% タイトルを全幅で表示し、以降を2段組にする設定
+\twocolumn[%
+\begin{center}
+    {\LARGE \textbf{卒業論文概要（ハンドアウト）}} \\
+    \medskip
+    {\large \textbf{システム制御理論研究室} \quad \textbf{越 海斗}}
+\end{center}
+\vspace{5mm}
+]
+
+\section{はじめに}
+本プロジェクトはAI駆動の研究テンプレートを用いて構築されています。
+
+\section{準備}
+ここに研究の背景や手法を記述します。
+
+\section{提案手法}
+ここに提案する手法の核となる部分を記述します。
+
+\section{計算例}
+シミュレーション結果などを記述します。
+
+\section{結言}
+今後の展望について記述します。
+
+\bibliographystyle{plain}
+{\small
+\bibliography{references}
+}
+
+\end{document}

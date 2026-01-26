@@ -1,0 +1,42 @@
+{
+    // LaTeX Workshop 設定
+    // 中間ファイルが出力されるディレクトリを指定
+    "latex-workshop.latex.outDir": "out",
+    // PDFビューアをVS Code内のタブで開く
+    "latex-workshop.view.pdf.viewer": "tab",
+    // 保存時に自動的に再ビルドする（Ctrl+Sでビルド）
+    "latex-workshop.latex.autoBuild.run": "onFileChange",
+    // ビルドの完了後に中間ファイルを自動で掃除するか（必要に応じて変更してください）
+    "latex-workshop.latex.autoClean.run": "onBuilt",
+    // ビルドレシピの設定（デフォルトのlatexmkを使用。プロジェクト内の.latexmkrcが優先されます）
+    "latex-workshop.latex.recipes": [
+        {
+            "name": "latexmk",
+            "tools": [
+                "latexmk"
+            ]
+        }
+    ],
+    "latex-workshop.latex.tools": [
+        {
+            "name": "latexmk",
+            "command": "latexmk",
+            "args": [
+                "-synctex=1",
+                "-interaction=nonstopmode",
+                "-file-line-error",
+                "-pdflua",
+                "-outdir=%OUTDIR%",
+                "%DOC%"
+            ],
+            "env": {}
+        }
+    ],
+    // スペルチェックなどのための言語設定 (任意)
+    "latex-workshop.view.outline.sections": [
+        "chapter",
+        "section",
+        "subsection",
+        "subsubsection"
+    ]
+}

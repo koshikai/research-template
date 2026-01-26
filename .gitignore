@@ -1,0 +1,51 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# IDE settings
+.idea/
+*.swp
+*.swo
+
+# Experiment outputs (keep structure, ignore large files)
+outputs/*/
+!outputs/.gitkeep
+
+# Data files (keep structure, ignore actual data)
+data/raw/
+data/interim/
+!data/.gitkeep
+!data/raw/.gitkeep
+!data/interim/.gitkeep
+
+# Reference images (generated from PDFs)
+references/images/
+
+# Jupyter/marimo checkpoints
+.ipynb_checkpoints/
+__marimo__/
+
+# Test caches
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# LaTeX auxiliary files
+tex/**/out/
+*.aux
+*.log
+*.synctex.gz
+*.fdb_latexmk
+*.fls
