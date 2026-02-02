@@ -21,7 +21,8 @@ description: 実験の追加、実行、結果確認の一連の手順
    - コマンド: `uv run poe exp --config configs/experiment_v1.yaml`
 
 4. **出力の確認**
-   - `outputs/` 配下に新しく生成されたディレクトリ（タイムスタンプ付き）を確認します。
+   - `outputs/<experiment_name>/<timestamp>/` に生成された結果を確認します。
+   - `outputs/<experiment_name>/latest/` も最新実行を指します。
    - `metrics.json` を読み取り、主要な指標を確認します。
    - ログを確認し、警告やエラーが出ていないかチェックします。
 

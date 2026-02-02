@@ -1,15 +1,19 @@
 import argparse
-from datetime import datetime
 from pathlib import Path
 
 from ai_research_template.core import LinearModel
 from ai_research_template.data import generate_linear_data
 from ai_research_template.metrics import compute_mse
 from ai_research_template.utils import (
+    current_timestamp,
     load_config,
+    prepare_output_dir,
+    save_params,
     save_results,
     setup_logger,
     update_experiment_summary,
+    write_daily_report_request,
+    write_report,
 )
 
 
@@ -24,9 +28,21 @@ def main():
 
     # 1. Load config
     config = load_config(args.config)
-    timestamp = datetime.now().strftime("%Y-%m-%d_%H%M%S")
-    output_dir = Path(config["output_dir"]) / timestamp
-    output_dir.mkdir(parents=True, exist_ok=True)
+    output_dir_config = config.get("output_dir")
+    if output_dir_config:
+        base_dir = Path(output_dir_config)
+        experiment_name = base_dir.name
+        output_root = base_dir.parent
+    else:
+        experiment_name = config.get("experiment_name", "experiment")
+        output_root = Path(config.get("output_root", "outputs"))
+
+    timestamp = current_timestamp()
+    output_dir = prepare_output_dir(
+        experiment_name=experiment_name,
+        output_root=output_root,
+        timestamp=timestamp,
+    )
 
     # Setup logger
     logger = setup_logger(output_dir)
@@ -59,11 +75,32 @@ def main():
         },
     }
     save_results(results, output_dir)
+    save_params(config, output_dir)
     update_experiment_summary(results, output_dir)
+    write_report(
+        [
+            "# Experiment Report",
+            "",
+            f"- Timestamp: {timestamp}",
+            f"- Experiment: {experiment_name}",
+            f"- Output: {output_dir}",
+            f"- MSE: {mse:.4f}",
+        ],
+        output_dir,
+    )
+    request_path = write_daily_report_request(
+        output_dir=output_dir,
+        experiment_name=experiment_name,
+        timestamp=timestamp,
+        config_path=args.config,
+        metrics=results.get("metrics", {}),
+    )
 
     logger.info(f"Experiment complete! Results saved to {output_dir}")
     logger.info(f"MSE: {mse:.4f}")
     logger.info(f"Estimated: y = {model.slope:.2f}x + {model.intercept:.2f}")
+    logger.info("Daily report request written.")
+    logger.info(f"Run: uv run poe daily-report --request {request_path}")
 
 
 if __name__ == "__main__":

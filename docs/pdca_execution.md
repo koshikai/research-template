@@ -34,6 +34,12 @@ Risks:
   - エージェントは `outputs/` のメトリクスを読み取ります。
   - 人間およびエージェントは `marimo` ノートブック（`uv run poe app`）を使用してインタラクティブに結果を可視化・分析します。
 - 評価レポートには「成功条件の達成可否」と「次のアクション」を記載します。
+- **Daily Research Log**:
+  - 日付単位の記録は `docs/experiments/YYYY-MM-DD.md` に追記します。
+  - 1実験ごとに短いサマリを残し、翌日の比較や振り返りに使います。
+  - 実験完了時に `outputs/<experiment>/<timestamp>/report_request.json` が作られるので、
+    AIエージェントはこれを入力として日次ログを執筆します。
+  - 執筆コマンド: `uv run poe daily-report --request <path>`
 
 ### 評価レポートの推奨構成
 ```text
@@ -46,6 +52,20 @@ Next Action:
   - 改善案 or 次の実験
 ```
 
+### Daily Research Log の推奨構成
+```text
+## YYYY-MM-DD HH:MM:SS - Experiment Name
+
+- Summary: 1-2行の要約
+- Decision: Pass/Fail/Continue
+- Next Action: 次に試すこと
+- Notes: 気づき、仮説、ログの要点
+- Output: outputs/<experiment>/<timestamp>/
+- Report: outputs/<experiment>/<timestamp>/report.md
+- Params: outputs/<experiment>/<timestamp>/params.json
+- Metrics: key=value
+```
+
 ## 4. Act (改善)
 - 評価結果が成功条件を満たさない場合、エージェントは自らエラーログを解析し、コードやパラメータを修正して `Plan` に戻ります。
 - 成功した場合は、次の研究ステップ（`roadmap.md` の次の項目）へ進みます。
@@ -53,5 +73,5 @@ Next Action:
 
 ## エージェントへの指示（設計思想）
 - **Log everything**: 標準出力だけでなく、重要な変数の推移などをログファイルに詳細に吐き出すよう設計させます。
-- **Standardized paths**: `outputs/latest/` といったシンボリックリンクや固定パスを用いることで、エージェントが「今何を見るべきか」を迷わないようにします。
+- **Standardized paths**: `outputs/<experiment_name>/latest/` や `outputs/latest/` といったシンボリックリンクを用いることで、エージェントが「今何を見るべきか」を迷わないようにします。
 - **Fail-fast**: 異常な値（NaN等）が検出されたら即座に停止し、エージェントに通知するアセットを用意します。

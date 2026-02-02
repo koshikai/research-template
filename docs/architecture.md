@@ -27,6 +27,7 @@ AIエージェントが各ファイルの役割を誤認しないよう、明確
 │   └── interim/           # 中間生成物
 ├── configs/               # 実験パラメータ (YAML/TOML)
 └── docs/                  # 本ドキュメント群
+    └── experiments/       # 日次の実験ログ (YYYY-MM-DD.md)
 ```
 
 ## ディレクトリの責務
@@ -37,6 +38,7 @@ AIエージェントが各ファイルの役割を誤認しないよう、明確
 - `data/`: 実データ（`raw` は不変、`interim` は生成物）
 - `notebooks/`: 探索用（`marimo` 推奨）。再現性の担保は `scripts/` を正とする
 - `tests/`: ユニット/リグレッションテスト
+- `docs/experiments/`: 日次の実験ログ（1実験1エントリで追記）
 - `.agent/`: エージェント設定とスキル（プロジェクト固有の知識を分離）
 
 ## `src/` の推奨構成
@@ -63,12 +65,14 @@ src/[project_name]/
 `outputs/` 配下は以下を推奨します。
 ```text
 outputs/
-└── 2025-01-01_120000/   # 例: タイムスタンプ付き
-    ├── logs/            # 実行ログ
-    ├── metrics.json     # 評価指標
-    ├── params.json      # 実験パラメータ
-    ├── artifacts/       # 生成物（モデル、プロット等）
-    └── report.md        # 短い実験要約
+└── <experiment_name>/
+    ├── latest/          # 最新実行へのシンボリックリンク
+    └── 2025-01-01_120000/
+        ├── logs/            # 実行ログ
+        ├── metrics.json     # 評価指標
+        ├── params.json      # 実験パラメータ
+        ├── artifacts/       # 生成物（モデル、プロット等）
+        └── report.md        # 短い実験要約
 ```
 
 ## 依存関係のルール

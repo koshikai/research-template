@@ -14,6 +14,8 @@
 1. **計画**: 修正や追加の前に、エージェントに `implementation_plan.md` を作らせ、ユーザーと合意を取らせます。
 2. **実装と自動修正**: 実装後、必ず `uv run poe lint` を実行させ、スタイルを整えさせると同時に型チェックをパスさせます。
 3. **検証**: 最後にテスト（`uv run poe test`）を実行し、すべてのチェックがパスすることを確認させます。
+4. **日次レポート**: 実験後は `uv run poe daily-report --request <path>` を実行し、
+   `docs/experiments/YYYY-MM-DD.md` にAIの考察を残させます。
 
 ## 指示テンプレート（短文）
 ```text

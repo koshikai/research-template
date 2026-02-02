@@ -50,6 +50,6 @@ def test_setup_logger():
         logger = setup_logger(output_dir)
 
         assert logger is not None
-        assert (output_dir / "experiment.log").exists()
+        assert (output_dir / "logs" / "experiment.log").exists()
 
         logger.info("Test message")

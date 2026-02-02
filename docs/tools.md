@@ -40,10 +40,15 @@
 | タスク | 指令 | 用途 |
 |---|---|---|
 | `exp` | `python scripts/run_experiment.py` | 実験の実行 |
-| `edit` | `marimo edit notebooks/analysis_sample.py` | ノートブックの編集 |
-| `app` | `marimo run ... --headless` | ノートブックをアプリとして実行 |
+| `edit` | `python -m marimo edit ${MARIMO_NOTEBOOK:-notebooks/analysis_sample.py}` | ノートブックの編集 |
+| `app` | `python -m marimo run ${MARIMO_NOTEBOOK:-notebooks/analysis_sample.py} --headless` | ノートブックをアプリとして実行 |
+| `ui-check` | `python scripts/marimo_ui_check.py` | Web UI 実行チェック |
 | `lint` | `ruff format ... && ruff check ...` | コード整形とチェック |
+| `typecheck` | `ty check src scripts` | 型チェック |
 | `test` | `pytest` | テストの実行 |
+
+※ `ui-check` は Playwright を使うため、初回のみ `uv run playwright install chromium` が必要です。
+※ marimo 系タスクは `MARIMO_NOTEBOOK` 環境変数で対象ノートブックを切り替えできます。
 
 ## 設定方針
 - 各ツールの設定は `pyproject.toml` に集約します。

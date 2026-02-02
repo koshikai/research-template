@@ -31,6 +31,7 @@ uv sync
 ```bash
 # Linter / Formatter / Typcheckを一括実行
 uv run poe lint
+uv run poe typecheck
 ```
 
 ### 3. 実験の実行
@@ -47,10 +48,12 @@ uv run poe app
 # ノートブックを編集モードで開く
 uv run poe edit
 ```
+※ `MARIMO_NOTEBOOK` 環境変数で対象ノートブックを切り替えできます。
 
 ## AIエージェント（Antigravity/Cursor）への指示
 - **型ヒント**: 新機能の追加時には必ず `Strict` な型ヒントを付けてください。
 - **PDCA**: 実験後は `outputs/` の結果を確認し、自律的に改善案（Act）を提示してください。
+- **marimo検証**: ノートブック作成/更新後は `uv run --group dev poe ui-check -- --notebook notebooks/your_notebook.py` でWeb UIエラーまで確認してください。
 - **計画**: 大規模な変更の前には `implementation_plan.md` を作成してユーザーと合意してください。
 
 ## ドキュメント

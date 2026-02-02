@@ -1,3 +1,4 @@
 metric_mse,model_estimated_intercept,model_estimated_slope,param_intercept,param_n_samples,param_noise_std,param_output_dir,param_slope,path,timestamp
 0.6328150800121698,-1.0416287127523074,2.5195533649992776,-1.0,200,0.8,outputs/sample_experiment,2.5,outputs/sample_experiment/2026-01-25_190308,2026-01-25_190308
 0.6066223271590486,-0.8948584137753287,2.500275078179707,-1.0,200,0.8,outputs/sample_experiment,2.5,outputs/sample_experiment/2026-01-26_210256,2026-01-26_210256
+0.7662835974290718,-0.850316452766455,2.4874507514573647,-1.0,200,0.8,outputs/sample_experiment,2.5,outputs/sample_experiment/2026-02-02_143029,2026-02-02_143029

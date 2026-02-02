@@ -1,43 +1,38 @@
 import argparse
-import json
-import logging
-from datetime import datetime
-from pathlib import Path
 
 from ai_research_template.core import ResearchModel
+from ai_research_template.utils import (
+    current_timestamp,
+    prepare_output_dir,
+    save_params,
+    save_results,
+    setup_logger,
+    write_daily_report_request,
+    write_report,
+)
 
 
 def main():
     parser = argparse.ArgumentParser(description="Simple training/experiment script.")
     parser.add_argument("--lr", type=float, default=0.01, help="Learning rate")
+    parser.add_argument(
+        "--experiment-name", type=str, default="train", help="Experiment name"
+    )
+    parser.add_argument(
+        "--output-root", type=str, default="outputs", help="Output root directory"
+    )
     args = parser.parse_args()
 
     # Setup paths
-    timestamp = datetime.now().strftime("%Y-%m-%d_%H%M%S")
-    output_dir = Path("outputs") / timestamp
-    output_dir.mkdir(parents=True, exist_ok=True)
-
-    # Update 'latest' symlink (linux)
-    latest_link = Path("outputs/latest")
-    if latest_link.exists() or latest_link.is_symlink():
-        latest_link.unlink()
-    try:
-        latest_link.symlink_to(
-            output_dir.relative_to(latest_link.parent), target_is_directory=True
-        )
-    except Exception:
-        # Fallback if symlink fails
-        pass
+    timestamp = current_timestamp()
+    output_dir = prepare_output_dir(
+        experiment_name=args.experiment_name,
+        output_root=args.output_root,
+        timestamp=timestamp,
+    )
 
     # Setup logging
-    log_file = output_dir / "logs" / "experiment.log"
-    log_file.parent.mkdir(exist_ok=True)
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s [%(levelname)s] %(message)s",
-        handlers=[logging.FileHandler(log_file), logging.StreamHandler()],
-    )
-    logger = logging.getLogger(__name__)
+    logger = setup_logger(output_dir)
 
     logger.info(f"Starting experiment with parameters: {args}")
 
@@ -49,18 +44,31 @@ def main():
     logger.info(f"Result computed: {result}")
 
     # Save artifacts (Checkpoint/Results)
-    metrics = {"success": True, "final_value": result, "parameters": vars(args)}
-    with open(output_dir / "metrics.json", "w") as f:
-        json.dump(metrics, f, indent=4)
-
-    # Automated check summary for the Agent
-    with open(output_dir / "report.md", "w") as f:
-        f.write("# Experiment Report\n\n")
-        f.write(f"- Timestamp: {timestamp}\n")
-        f.write("- Status: Success\n")
-        f.write(f"- Result: {result}\n")
+    metrics = {"success": True, "final_value": result}
+    save_results(metrics, output_dir)
+    save_params(vars(args), output_dir)
+    write_report(
+        [
+            "# Experiment Report",
+            "",
+            f"- Timestamp: {timestamp}",
+            f"- Experiment: {args.experiment_name}",
+            "- Status: Success",
+            f"- Result: {result}",
+        ],
+        output_dir,
+    )
+    request_path = write_daily_report_request(
+        output_dir=output_dir,
+        experiment_name=args.experiment_name,
+        timestamp=timestamp,
+        config_path=None,
+        metrics=metrics,
+    )
 
     logger.info(f"Experiment finished. Results saved to {output_dir}")
+    logger.info("Daily report request written.")
+    logger.info(f"Run: uv run poe daily-report --request {request_path}")
 
 
 if __name__ == "__main__":

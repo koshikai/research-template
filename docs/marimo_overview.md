@@ -34,6 +34,20 @@ uv run marimo edit notebook.py
 uv run marimo edit --sandbox notebook.py
 ```
 
+## Web UI の実行チェック
+
+`marimo` ノートブックをWeb UIとして実行し、ブラウザ側のエラーまで確認したい場合は
+スモークテストを使います。
+
+```bash
+# 依存 (初回のみ)
+uv add --dev playwright
+uv run playwright install chromium
+
+# UIチェック
+uv run --group dev poe ui-check -- --notebook notebooks/analysis_sample.py
+```
+
 ## ベストプラクティス
 
 1. **グローバル変数の抑制**: 意図しない再実行を防ぐため、変数は関数内に閉じ込めるか、セルのローカルにするためにアンダースコア（`_tmp`など）を付けます。
