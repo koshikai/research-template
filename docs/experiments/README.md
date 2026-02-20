@@ -15,6 +15,7 @@ Recommended entry template:
 - Summary: 1-2 line summary
 - Decision: Pass/Fail/Continue
 - Next Action: what to try next
+- Thought Flow: hypothesis -> verification -> decision
 - Notes: insights, hypotheses, key logs
 - Output: outputs/<experiment>/<timestamp>/
 - Report: outputs/<experiment>/<timestamp>/report.md

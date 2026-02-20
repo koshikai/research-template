@@ -2,19 +2,26 @@
 from __future__ import annotations
 
 import argparse
+from typing import Any
 
 HTTP_ERROR_THRESHOLD = 400
 
+sync_playwright_factory: Any | None
+try:
+    from playwright.sync_api import sync_playwright as _sync_playwright_factory
+except ImportError:
+    sync_playwright_factory = None
+else:
+    sync_playwright_factory = _sync_playwright_factory
 
-def _load_playwright():
-    try:
-        from playwright.sync_api import sync_playwright
-    except ImportError:
+
+def _load_playwright() -> Any:
+    if sync_playwright_factory is None:
         raise RuntimeError(
             "playwright is not installed. Install it with: "
             "uv add --dev playwright && uv run playwright install chromium"
         )
-    return sync_playwright
+    return sync_playwright_factory
 
 
 def run(url: str, timeout_ms: int, settle_ms: int, screenshot: str | None) -> int:
@@ -30,9 +37,9 @@ def run(url: str, timeout_ms: int, settle_ms: int, screenshot: str | None) -> in
         # Collect JS/runtime errors surfaced in the browser.
         page.on(
             "console",
-            lambda msg: console_errors.append(msg.text)
-            if msg.type == "error"
-            else None,
+            lambda msg: (
+                console_errors.append(msg.text) if msg.type == "error" else None
+            ),
         )
         page.on("pageerror", lambda err: page_errors.append(str(err)))
 

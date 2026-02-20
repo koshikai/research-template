@@ -59,6 +59,7 @@ Next Action:
 - Summary: 1-2行の要約
 - Decision: Pass/Fail/Continue
 - Next Action: 次に試すこと
+- Thought Flow: 仮説 -> 検証 -> 判断
 - Notes: 気づき、仮説、ログの要点
 - Output: outputs/<experiment>/<timestamp>/
 - Report: outputs/<experiment>/<timestamp>/report.md

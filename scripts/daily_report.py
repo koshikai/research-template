@@ -73,6 +73,12 @@ def main() -> None:
         default=None,
         help="Next action to take.",
     )
+    parser.add_argument(
+        "--thought-flow",
+        type=str,
+        default=None,
+        help="Reasoning flow (hypothesis -> check -> judgment).",
+    )
     parser.add_argument("--notes", type=str, default=None, help="Extra notes.")
     args = parser.parse_args()
 
@@ -98,6 +104,10 @@ def main() -> None:
     summary = get_value(args.summary, "Summary")
     decision = get_value(args.decision, "Decision (Pass/Fail/Continue)")
     next_action = get_value(args.next_action, "Next action")
+    thought_flow = get_value(
+        args.thought_flow,
+        "Thought flow (hypothesis -> check -> judgment)",
+    )
     notes = get_value(args.notes, "Notes")
 
     entry_lines = [
@@ -106,6 +116,7 @@ def main() -> None:
         f"- Summary: {summary}",
         f"- Decision: {decision}",
         f"- Next Action: {next_action}",
+        f"- Thought Flow: {thought_flow}",
         f"- Notes: {notes}",
         f"- Output: {output_dir}",
         f"- Report: {report_path}",

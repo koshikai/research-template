@@ -1,17 +1,24 @@
 import logging
 from pathlib import Path
+from typing import Any
+
+pymupdf4llm: Any | None
+try:
+    import pymupdf4llm as _pymupdf4llm_module
+except ImportError:
+    pymupdf4llm = None
+else:
+    pymupdf4llm = _pymupdf4llm_module
 
 
-def main():
+def main() -> None:
     # Setup simple logging
     logging.basicConfig(
         level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
     )
     logger = logging.getLogger("paper_converter")
 
-    try:
-        import pymupdf4llm
-    except ImportError:
+    if pymupdf4llm is None:
         logger.error("pymupdf4llm is not installed. Please run 'uv add pymupdf4llm'")
         return
 

@@ -23,7 +23,7 @@ dev = [
     "ruff>=0.9.0",
     "marimo>=0.10.0",
     "playwright>=1.40.0",
-    "ty>=0.0.14",
+    "ty>=0.0.17",
     "poethepoet>=0.32.0",
 ]
 
@@ -65,6 +65,10 @@ indent-style = "space"
 # Target Python version for type checking. (Usually inferred from `project.requires-python`,
 # but we pin it here to make behavior explicit.)
 python-version = "3.13"
+
+[tool.ty.src]
+# notebooks/ は marimo 形式のため ty がクラッシュする問題を回避
+include = ["src", "scripts", "tests"]
 
 [tool.ty.terminal]
 # Treat warning-level diagnostics as failures, approximating a "strict" policy.
