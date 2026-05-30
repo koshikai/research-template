@@ -1,0 +1,63 @@
+% !TEX TSX Program = lualatex
+\documentclass[a4paper,twocolumn,10pt]{ltjsarticle}
+
+\usepackage{amsfonts}
+\usepackage{amscd}
+\usepackage{graphicx, xcolor}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{newtxmath,newtxtext}
+\usepackage[haranoaji,deluxe]{luatexja-preset}
+\usepackage{bm}
+\usepackage{comment}
+\usepackage{xurl}
+\usepackage{cite}
+\usepackage{tikz}
+\usetikzlibrary{automata, positioning, arrows, shapes}
+\usepackage[justification=centering,hang,small,bf]{caption}
+\usepackage[subrefformat=parens]{subcaption}
+\usepackage[unicode,hidelinks]{hyperref}
+\usepackage{bookmark}
+\usepackage[top=20mm, bottom=25mm, left=18mm, right=18mm]{geometry}
+\captionsetup{compatibility=false}
+
+% ref コマンドの再定義
+\let\oldref\ref
+\renewcommand{\ref}[1]{\textup{\oldref{#1}}}
+
+\theoremstyle{definition}
+\newtheorem{definition}{定義}
+\newtheorem{thm}{定理}
+\newtheorem{pro}{問題}
+\newtheorem{ex}{例}
+
+\renewcommand{\figurename}{図}
+\renewcommand{\tablename}{Table.}
+
+% ページ設定 (geometry パッケージで管理)
+\setlength{\parindent}{1\zw}
+\setlength{\parskip}{0mm}
+\setlength{\columnsep}{7mm}
+\raggedbottom % 高さを強制的に揃えない（大きな隙間を防ぐ）
+
+\begin{document}
+\pagestyle{empty}
+\twocolumn[%
+\small
+\begin{center}
+{\LARGE{\textbf{タイトルを入力してください}}}\\
+\medskip
+{\large{\textbf{所属研究室名}\quad\quad
+{\textbf{氏 名}}}}
+\end{center}
+]
+
+\input{sections/01_introduction}
+\input{sections/02_preparation}
+\input{sections/03_proposal}
+\input{sections/04_experiment}
+\input{sections/05_conclusion}
+
+\bibliographystyle{ieeetr}
+\bibliography{Ref}
+
+\end{document}

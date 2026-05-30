@@ -1,0 +1,109 @@
+% !TEX TSX Program = lualatex
+\documentclass[lualatex,a4paper,11pt,ja=standard,jafont=haranoaji]{bxjsarticle}
+
+\usepackage{fontspec}
+\usepackage{amsmath}
+\usepackage{unicode-math}
+\setmainfont{TeX Gyre Termes}
+\setsansfont{TeX Gyre Heros}
+\setmonofont{TeX Gyre Cursor}
+\setmathfont{texgyretermes-math.otf}
+% \setmathfont{XITSMath-Regular.otf}[range={cal,bfcal},StylisticSet=1]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{graphicx}%
+\usepackage{xcolor}% 
+\usepackage[unicode,colorlinks=true,citecolor=blue,linkcolor=blue,urlcolor=orange]{hyperref}%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+% Theorem styles
+\usepackage{amsthm}%
+\makeatletter
+    \newtheoremstyle{my@thm@style}% Style Name
+        {\thm@preskip\topsep}% Upper space
+        {\thm@preskip\topsep}% Lower space
+        {\normalfont}% font
+        {}% indents
+        {\sffamily\gtfamily}% Index font
+        {}% After index
+        { }% Space after index
+        {}% index style
+    \theoremstyle{my@thm@style}
+\makeatother
+\newtheorem{thm}{定理}%
+\newtheorem*{thm*}{定理}%
+\newtheorem{lem}[thm]{補題}%
+\newtheorem*{lem*}{補題}%
+\newtheorem{prop}[thm]{命題}%
+\newtheorem*{prop*}{命題}%
+\newtheorem{cor}[thm]{系}%
+\newtheorem*{cor*}{系}%
+\newtheorem{defi}[thm]{定義}%
+\newtheorem*{defi*}{定義}%
+\newtheorem{assum}[thm]{仮定}%
+\newtheorem*{assum*}{仮定}%
+\newtheorem{rem}[thm]{注意}%
+\newtheorem*{rem*}{注意}%
+\newtheorem{ex}[thm]{\textbf{例}}%
+\newtheorem*{ex*}{\textbf{例}}%
+
+%追加
+\newtheorem{pro}{\textbf{問題}}%
+\newtheorem*{pro*}{\textbf{問題}}%
+
+\makeatletter
+    \renewenvironment{proof}[1][\proofname]{\par%
+        \pushQED{\qed}%
+        \normalfont \topsep6\p@\@plus6\p@\relax%
+        \trivlist%
+        \item\relax%
+        {#1}\hspace\labelsep\ignorespaces%
+    }{%
+        \popQED\endtrivlist\@endpefalse%
+    }%
+    \renewcommand{\proofname}{{\textsf{\gtfamily 証明}}}%
+\makeatother
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{titlesec}
+
+\titleformat{\section}
+  {\normalfont\Large\bfseries}
+  {\thesection}
+  {1em}
+  {\textsf}
+
+\titleformat{\subsection}
+  {\normalfont\large\bfseries}
+  {\thesubsection}
+  {1em}
+  {\textsf}
+
+\titleformat{\subsubsection}
+  {\normalfont\large\bfseries}
+  {\thesubsubsection}
+  {1em}
+  {\textsf}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+\title{
+タイトルを入力してください
+}
+\author{氏名}
+\date{\today}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+\maketitle
+
+\input{sections/01_introduction}
+\input{sections/02_preparation}
+\input{sections/03_proposal}
+\input{sections/04_experiment}
+\input{sections/05_conclusion}
+
+\bibliographystyle{ieeetr}
+\bibliography{Ref}
+
+\end{document}

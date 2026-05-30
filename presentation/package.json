@@ -1,0 +1,12 @@
+{
+  "name": "presentation-tools",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:pptxgen": "bun scripts/marp-to-pptxgenjs.mjs demo.md -o demo-pptxgenjs.pptx"
+  },
+  "dependencies": {
+    "gray-matter": "^4.0.3",
+    "pptxgenjs": "^4.0.1"
+  }
+}
