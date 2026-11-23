@@ -1,78 +1,15 @@
-# 自律型PDCAサイクルと実行プロトコル
+# 実験の計画・実行・記録
 
-本テンプレートは、Antigravity等のAIエージェントが自律的に**PDCA（Plan-Do-Check-Act）サイクル**を回し、研究を継続的に改善することを目的としています。
+1. [研究計画のひな形](templates/study.md)を `docs/studies/<study-id>.md` にコピーする。問い、比較対象、指標、停止条件を記す。
+2. 設定を `configs/` に保存し、出力先を確認して実行する。
 
-## 1. Plan (計画)
-- エージェントは課題に対し、`implementation_plan.md` を作成、または `task.md` を更新して作業内容を明文化します。
-- この際、**「何を成功条件とするか（Success Criteria）」**を定義させます（例：テストの全パス、特定のメトリクスの向上など）。
-- **成功条件は定量化**し、評価可能な形で記述します（例：`accuracy >= 0.85`、`latency <= 200ms`）。
+   ```bash
+   uv run --locked poe exp --config configs/sample.yaml
+   ```
 
-### 計画ファイルの最小テンプレート
-```text
-Title: 実験の目的
-Context: 背景と仮説
-Success Criteria:
-  - 指標A: 目標値
-  - 指標B: 目標値
-Plan:
-  - 手順1
-  - 手順2
-Risks:
-  - 失敗要因と回避策
-```
+3. `outputs/<experiment>/<run_id>/` の `manifest.json`、`params.json`、`metrics.json` を確認する。マニフェストは処理と成果物の保存が完了した時点で作られる。再試行には別の run ID を使う。
+4. 報告に run ID と保存先を記す。共有が必要な成果物は保管先と保存期間を決める。コードに未コミットの変更がある run を引用する場合は、その差分も保存する。
+5. 方針を変える場合は、[判断のひな形](templates/decision.md)を `docs/decisions/<id>-<topic>.md` にコピーし、理由と根拠を書く。状態や次の作業が変わったらラインカードを更新する。
 
-## 2. Do (実行: CLIベース)
-- 全てのコード実行はCLI（`uv run`）を通じて行います。
-- `poethepoet` により、共通のタスクは短縮コマンドで実行可能です。
-- **実験の実行**: `uv run poe exp`
-- スクリプトは `scripts/` 配下に集約し、引数でパラメータを受け取れるように設計します。
-- 実行コマンド、使用した設定、および出力は `outputs/` にタイムスタンプ付きで保存されます。
-
-## 3. Check (評価: 成果物確認)
-- 実行結果（ログ、メトリクス、生成されたグラフ等）は `outputs/` または `data/interim/` に決まった形式で保存します。
-- **Report & Visualization**: 
-  - エージェントは `outputs/` のメトリクスを読み取ります。
-  - 人間およびエージェントは `marimo` ノートブック（`uv run poe app`）を使用してインタラクティブに結果を可視化・分析します。
-- 評価レポートには「成功条件の達成可否」と「次のアクション」を記載します。
-- **Daily Research Log**:
-  - 日付単位の記録は `docs/experiments/YYYY-MM-DD.md` に追記します。
-  - 1実験ごとに短いサマリを残し、翌日の比較や振り返りに使います。
-  - 実験完了時に `outputs/<experiment>/<timestamp>/report_request.json` が作られるので、
-    AIエージェントはこれを入力として日次ログを執筆します。
-  - 執筆コマンド: `uv run poe daily-report --request <path>`
-
-### 評価レポートの推奨構成
-```text
-Result Summary:
-  - 指標A: 実測値 (目標: XX)
-  - 指標B: 実測値 (目標: XX)
-Decision:
-  - Pass / Fail
-Next Action:
-  - 改善案 or 次の実験
-```
-
-### Daily Research Log の推奨構成
-```text
-## YYYY-MM-DD HH:MM:SS - Experiment Name
-
-- Summary: 1-2行の要約
-- Decision: Pass/Fail/Continue
-- Next Action: 次に試すこと
-- Thought Flow: 仮説 -> 検証 -> 判断
-- Notes: 気づき、仮説、ログの要点
-- Output: outputs/<experiment>/<timestamp>/
-- Report: outputs/<experiment>/<timestamp>/report.md
-- Params: outputs/<experiment>/<timestamp>/params.json
-- Metrics: key=value
-```
-
-## 4. Act (改善)
-- 評価結果が成功条件を満たさない場合、エージェントは自らエラーログを解析し、コードやパラメータを修正して `Plan` に戻ります。
-- 成功した場合は、次の研究ステップ（`roadmap.md` の次の項目）へ進みます。
-- 失敗時は「失敗原因」と「次に試す仮説」を明文化し、計画ファイルに追記します。
-
-## エージェントへの指示（設計思想）
-- **Log everything**: 標準出力だけでなく、重要な変数の推移などをログファイルに詳細に吐き出すよう設計させます。
-- **Standardized paths**: `outputs/<experiment_name>/latest/` や `outputs/latest/` といったシンボリックリンクを用いることで、エージェントが「今何を見るべきか」を迷わないようにします。
-- **Fail-fast**: 異常な値（NaN等）が検出されたら即座に停止し、エージェントに通知するアセットを用意します。
+`latest` は直近に完了した run を開くためのリンク。報告では個別の run を参照する。
+日付別の作業メモが必要な場合は、run 内の `report_request.json` を使って作成できる。

@@ -35,7 +35,7 @@ uv run poe test
 ## 4. 自分用のカスタマイズ
 - **README.md**: プロジェクトの目的や仮説に書き換えます。
 - **configs/**: 不要なサンプル設定を削除し、自分の実験設定を作成します。
-- **出力先**: `outputs/<experiment_name>/<timestamp>/` に統一されるため、
+- **出力先**: `outputs/<experiment_name>/<run_id>/` に統一されるため、
   `configs/` では `output_dir` か `experiment_name` を設定しておくと便利です。
 - **.agent/skills/**: 研究に必要な追加スキルがあれば Antigravity に実装させます。
 

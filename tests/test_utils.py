@@ -6,7 +6,13 @@ from pathlib import Path
 
 import yaml
 
-from ai_research_template.utils import load_config, save_results, setup_logger
+from ai_research_template.utils import (
+    complete_run,
+    load_config,
+    prepare_output_dir,
+    save_results,
+    setup_logger,
+)
 
 
 def test_load_config():
@@ -52,3 +58,24 @@ def test_setup_logger():
         assert (output_dir / "logs" / "experiment.log").exists()
 
         logger.info("Test message")
+
+
+def test_run_completion_keeps_incomplete_runs_out_of_latest(tmp_path: Path) -> None:
+    timestamp = "2026-01-01_000000"
+    completed = prepare_output_dir("sample", tmp_path, timestamp)
+    incomplete = prepare_output_dir("sample", tmp_path, timestamp)
+
+    assert incomplete != completed
+    assert not (tmp_path / "latest").exists()
+
+    complete_run(completed, {"git_commit": "example"})
+    manifest = json.loads((completed / "manifest.json").read_text())
+    assert manifest["run_id"] == completed.name
+    assert manifest["git_commit"] == "example"
+    assert (tmp_path / "latest").resolve() == completed
+    assert (tmp_path / "sample/latest").resolve() == completed
+    assert not (incomplete / "manifest.json").exists()
+
+    complete_run(incomplete, {"git_commit": "example"})
+    assert (tmp_path / "latest").resolve() == incomplete
+    assert (completed / "manifest.json").exists()

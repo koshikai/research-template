@@ -17,8 +17,8 @@ Recommended entry template:
 - Next Action: what to try next
 - Thought Flow: hypothesis -> verification -> decision
 - Notes: insights, hypotheses, key logs
-- Output: outputs/<experiment>/<timestamp>/
-- Report: outputs/<experiment>/<timestamp>/report.md
-- Params: outputs/<experiment>/<timestamp>/params.json
+- Output: outputs/<experiment>/<run_id>/
+- Report: outputs/<experiment>/<run_id>/report.md
+- Params: outputs/<experiment>/<run_id>/params.json
 - Metrics: key=value
 ```

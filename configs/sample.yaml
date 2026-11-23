@@ -3,4 +3,5 @@ n_samples: 200
 slope: 2.5
 intercept: -1.0
 noise_std: 0.8
+seed: 0
 output_dir: "outputs/sample_experiment"

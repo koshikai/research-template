@@ -2,8 +2,10 @@ import argparse
 
 from ai_research_template.core import ResearchModel
 from ai_research_template.utils import (
+    complete_run,
     current_timestamp,
     prepare_output_dir,
+    run_provenance,
     save_params,
     save_results,
     setup_logger,
@@ -12,7 +14,7 @@ from ai_research_template.utils import (
 )
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description="Simple training/experiment script.")
     parser.add_argument("--lr", type=float, default=0.01, help="Learning rate")
     parser.add_argument(
@@ -24,6 +26,7 @@ def main():
     args = parser.parse_args()
 
     # Setup paths
+    provenance = run_provenance()
     timestamp = current_timestamp()
     output_dir = prepare_output_dir(
         experiment_name=args.experiment_name,
@@ -67,6 +70,7 @@ def main():
     )
 
     logger.info(f"Experiment finished. Results saved to {output_dir}")
+    complete_run(output_dir, provenance)
     logger.info("Daily report request written.")
     logger.info(f"Run: uv run poe daily-report --request {request_path}")
 

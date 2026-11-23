@@ -5,19 +5,20 @@ from ai_research_template.core import LinearModel
 from ai_research_template.data import generate_linear_data
 from ai_research_template.metrics import compute_mse
 from ai_research_template.utils import (
+    complete_run,
     current_timestamp,
     load_config,
     prepare_output_dir,
+    run_provenance,
     save_params,
     save_results,
     setup_logger,
-    update_experiment_summary,
     write_daily_report_request,
     write_report,
 )
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(
         description="Run a sample linear regression experiment."
     )
@@ -28,6 +29,7 @@ def main():
 
     # 1. Load config
     config = load_config(args.config)
+    config.setdefault("seed", 0)
     output_dir_config = config.get("output_dir")
     if output_dir_config:
         base_dir = Path(output_dir_config)
@@ -37,6 +39,7 @@ def main():
         experiment_name = config.get("experiment_name", "experiment")
         output_root = Path(config.get("output_root", "outputs"))
 
+    provenance = run_provenance(args.config)
     timestamp = current_timestamp()
     output_dir = prepare_output_dir(
         experiment_name=experiment_name,
@@ -55,6 +58,7 @@ def main():
         slope=config["slope"],
         intercept=config["intercept"],
         noise_std=config["noise_std"],
+        seed=config["seed"],
     )
 
     # 3. Fit model
@@ -76,7 +80,6 @@ def main():
     }
     save_results(results, output_dir)
     save_params(config, output_dir)
-    update_experiment_summary(results, output_dir)
     write_report(
         [
             "# Experiment Report",
@@ -99,6 +102,7 @@ def main():
     logger.info(f"Experiment complete! Results saved to {output_dir}")
     logger.info(f"MSE: {mse:.4f}")
     logger.info(f"Estimated: y = {model.slope:.2f}x + {model.intercept:.2f}")
+    complete_run(output_dir, provenance)
     logger.info("Daily report request written.")
     logger.info(f"Run: uv run poe daily-report --request {request_path}")
 

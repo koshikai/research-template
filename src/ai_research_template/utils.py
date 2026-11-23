@@ -4,22 +4,25 @@ This module provides helper functions for:
 - Configuration loading (YAML files)
 - Logging setup (file and console output)
 - Result saving (JSON format)
-- Experiment summary tracking (CSV format)
 """
 
-import csv
 import json
 import logging
-from datetime import datetime
+import platform
+import subprocess
+import sys
+from datetime import UTC, datetime
+from hashlib import sha256
 from pathlib import Path
 from typing import Any
+from uuid import uuid4
 
 import yaml
 
 
 def current_timestamp() -> str:
     """Return a filesystem-safe timestamp for experiment folders."""
-    return datetime.now().strftime("%Y-%m-%d_%H%M%S")
+    return datetime.now(UTC).strftime("%Y-%m-%d_%H%M%S")
 
 
 def update_latest_symlink(latest_link: Path, target_dir: Path) -> None:
@@ -28,27 +31,25 @@ def update_latest_symlink(latest_link: Path, target_dir: Path) -> None:
     Errors are ignored to keep the experiment flow robust on systems
     that don't support symlinks.
     """
+    temporary_link = latest_link.with_name(f".latest-{uuid4().hex}")
     try:
-        if latest_link.exists() or latest_link.is_symlink():
-            latest_link.unlink()
-        latest_link.symlink_to(
+        temporary_link.symlink_to(
             target_dir.relative_to(latest_link.parent), target_is_directory=True
         )
-    except Exception:
-        # Fallback if symlink fails or filesystem doesn't support it.
-        pass
+        temporary_link.replace(latest_link)
+    except OSError:
+        temporary_link.unlink(missing_ok=True)
 
 
 def prepare_output_dir(
     experiment_name: str,
     output_root: Path | str = Path("outputs"),
     timestamp: str | None = None,
-    update_latest: bool = True,
 ) -> Path:
     """Create a standardized output directory for an experiment.
 
     Layout:
-      outputs/<experiment_name>/<timestamp>/
+      outputs/<experiment_name>/<run_id>/
         logs/
         artifacts/
         metrics.json
@@ -58,14 +59,10 @@ def prepare_output_dir(
     output_root_path = Path(output_root)
     exp_root = output_root_path / experiment_name
     ts = timestamp or current_timestamp()
-    output_dir = exp_root / ts
-    output_dir.mkdir(parents=True, exist_ok=True)
+    output_dir = exp_root / f"{ts}-{uuid4().hex}"
+    output_dir.mkdir(parents=True, exist_ok=False)
     (output_dir / "logs").mkdir(exist_ok=True)
     (output_dir / "artifacts").mkdir(exist_ok=True)
-
-    if update_latest:
-        update_latest_symlink(exp_root / "latest", output_dir)
-        update_latest_symlink(output_root_path / "latest", output_dir)
 
     return output_dir
 
@@ -110,74 +107,54 @@ def setup_logger(output_dir: Path, name: str = "experiment") -> logging.Logger:
     return logger
 
 
-def update_experiment_summary(results: dict[str, Any], output_dir: Path) -> None:
-    """Update the global experiment summary CSV file.
+def run_provenance(config_path: str | None = None) -> dict[str, Any]:
+    """Capture the code and environment before running the computation."""
+    repository = Path(__file__).resolve().parents[2]
+    commit = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=repository,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    status = subprocess.run(
+        ["git", "status", "--porcelain"],
+        cwd=repository,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    lockfile = repository / "uv.lock"
+    return {
+        "schema_version": 1,
+        "lock_sha256": sha256(lockfile.read_bytes()).hexdigest()
+        if lockfile.is_file()
+        else None,
+        "started_utc": datetime.now(UTC).isoformat(),
+        "git_commit": commit.stdout.strip() if commit.returncode == 0 else None,
+        "git_dirty": bool(status.stdout) if status.returncode == 0 else None,
+        "argv": sys.argv,
+        "cwd": str(Path.cwd()),
+        "config_path": config_path,
+        "python": platform.python_version(),
+        "platform": platform.platform(),
+    }
 
-    Appends a new row to experiments.csv with flattened results.
-    Keys are prefixed to indicate their source:
-    - param_*: Configuration parameters
-    - metric_*: Evaluation metrics
-    - model_*: Model parameters
 
-    Args:
-        results: Dictionary containing 'config', 'metrics', and 'model_params' keys.
-        output_dir: Directory of the current experiment (used to derive CSV path).
-
-    Note:
-        The CSV file is located at outputs/experiments.csv.
-        If the CSV already exists with different columns, new columns will be
-        added but existing rows may have empty values for new columns.
-    """
-    summary_path = Path("outputs/experiments.csv")
-
-    # Flatten the results for CSV
-    flat_results: dict[str, Any] = {}
-
-    # Add timestamp and path
-    flat_results["timestamp"] = output_dir.name
-    flat_results["path"] = str(output_dir)
-
-    # Add config params (prefix with param_)
-    for key, value in results.get("config", {}).items():
-        if isinstance(value, (int, float, str, bool)):
-            flat_results[f"param_{key}"] = value
-
-    # Add metrics (prefix with metric_)
-    for key, value in results.get("metrics", {}).items():
-        if isinstance(value, (int, float, str, bool)):
-            flat_results[f"metric_{key}"] = value
-
-    # Add model params (prefix with model_)
-    for key, value in results.get("model_params", {}).items():
-        if isinstance(value, (int, float, str, bool)):
-            flat_results[f"model_{key}"] = value
-
-    # Read existing headers if file exists
-    existing_headers: list[str] = []
-    if summary_path.exists():
-        with open(summary_path, newline="", encoding="utf-8") as f:
-            reader = csv.reader(f)
-            existing_headers = next(reader, [])
-
-    # Merge headers: existing + new columns
-    all_keys = set(existing_headers) | set(flat_results.keys())
-    fieldnames = sorted(all_keys)
-
-    # If file exists, read all rows and rewrite with updated headers
-    rows: list[dict[str, Any]] = []
-    if summary_path.exists() and existing_headers:
-        with open(summary_path, newline="", encoding="utf-8") as f:
-            reader = csv.DictReader(f)
-            rows = list(reader)
-
-    # Append new result
-    rows.append(flat_results)
-
-    # Write all rows with complete fieldnames
-    with open(summary_path, "w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction="ignore")
-        writer.writeheader()
-        writer.writerows(rows)
+def complete_run(output_dir: Path, provenance: dict[str, Any]) -> None:
+    """Publish the completion record and update the convenience links."""
+    manifest = {
+        **provenance,
+        "run_id": output_dir.name,
+        "finished_utc": datetime.now(UTC).isoformat(),
+        "params": "params.json",
+        "metrics": "metrics.json",
+    }
+    pending = output_dir / ".manifest.tmp"
+    pending.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    pending.replace(output_dir / "manifest.json")
+    update_latest_symlink(output_dir.parent / "latest", output_dir)
+    update_latest_symlink(output_dir.parent.parent / "latest", output_dir)
 
 
 def load_config(config_path: str | Path) -> dict[str, Any]:

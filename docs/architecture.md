@@ -19,7 +19,7 @@ AIエージェントが各ファイルの役割を誤認しないよう、明確
 │   └── convert_papers.py
 ├── outputs/               # 実験結果、ログ、プロット (エージェントがCheckする場所)
 │   ├── latest/
-│   └── [timestamp]/
+│   └── [run_id]/
 ├── notebooks/             # 試行錯誤用の marimo Notebook
 ├── tests/                 # ユニットテスト、リグレッションテスト
 ├── data/                  # 実データ（Git管理対象外）
@@ -66,8 +66,9 @@ src/[project_name]/
 ```text
 outputs/
 └── <experiment_name>/
-    ├── latest/          # 最新実行へのシンボリックリンク
-    └── 2025-01-01_120000/
+    ├── latest/          # 直近に完了した run へのシンボリックリンク
+    └── <run_id>/
+        ├── manifest.json  # 完了時の実行記録
         ├── logs/            # 実行ログ
         ├── metrics.json     # 評価指標
         ├── params.json      # 実験パラメータ

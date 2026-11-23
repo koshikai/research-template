@@ -16,6 +16,7 @@ wheels/
 
 # Experiment outputs (keep structure, ignore large files)
 outputs/*/
+outputs/latest
 !outputs/.gitkeep
 
 # Data files (keep structure, ignore actual data)
