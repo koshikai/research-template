@@ -7,6 +7,7 @@ This module provides helper functions for:
 
 import json
 import logging
+import os
 import platform
 import subprocess
 import sys
@@ -139,7 +140,12 @@ def run_provenance(config_path: str | None = None) -> dict[str, Any]:
 
 
 def complete_run(output_dir: Path, provenance: dict[str, Any]) -> None:
-    """Publish the completion record and update the convenience links."""
+    """Publish a run once its parameter and metric files are readable."""
+    for filename in ("params.json", "metrics.json"):
+        path = output_dir / filename
+        with path.open(encoding="utf-8") as file:
+            if not isinstance(json.load(file), dict):
+                raise ValueError(f"Expected a JSON object in {path}")
     manifest = {
         **provenance,
         "run_id": output_dir.name,
@@ -147,9 +153,12 @@ def complete_run(output_dir: Path, provenance: dict[str, Any]) -> None:
         "params": "params.json",
         "metrics": "metrics.json",
     }
-    pending = output_dir / ".manifest.tmp"
-    pending.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
-    pending.replace(output_dir / "manifest.json")
+    pending = output_dir / f".manifest-{uuid4().hex}.tmp"
+    try:
+        pending.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+        os.link(pending, output_dir / "manifest.json")
+    finally:
+        pending.unlink(missing_ok=True)
     update_latest_symlink(output_dir.parent / "latest", output_dir)
     update_latest_symlink(output_dir.parent.parent / "latest", output_dir)
 

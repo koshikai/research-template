@@ -24,6 +24,6 @@ uv run --locked pytest
 
 1. 実行前に、問い、比較対象、指標、判断基準を研究計画に書きます。
 2. 実験ごとに必要な設定と実行 CLI を追加します。[run 記録用の関数](src/ai_research_template/utils.py)を使うと、出力を `outputs/<experiment>/<run_id>/` にまとめられます。
-3. 完了後に `manifest.json`、`params.json`、`metrics.json` を確認します。報告には個別の run ID と保存先を記します。未コミットの変更がある run を引用する場合は、差分も保存します。
+3. 実行前に `run_provenance` で実行情報を取得します。実行後に `save_params` と `save_results` で保存し、`complete_run` で完了を記録します。報告には個別の run ID と保存先を記します。未コミットの変更がある run を引用する場合は、差分も保存します。
 
 `outputs/` は Git の追跡対象外です。共有が必要な成果物の保管先は、研究報告に記します。再試行には別の run ID を使います。
