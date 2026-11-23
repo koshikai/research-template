@@ -5,8 +5,8 @@ GitHub の Use this template でリポジトリを作成し、クローン先で
 ```bash
 uv run --no-project python scripts/rename_project.py my_research
 uv sync --locked
-uv run --locked poe test
-uv run --locked poe exp --config configs/sample.yaml
+uv run --locked pytest
+uv run --locked python scripts/run_experiment.py --config configs/sample.yaml
 ```
 
 `my_research` はプロジェクトに合わせて変更します。初期設定が済んだら、この README に研究の目的とラインカードへのリンクを置きます。

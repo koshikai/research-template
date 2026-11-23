@@ -15,7 +15,6 @@ dev = [
     "pytest>=8.0.0",
     "ruff>=0.9.0",
     "ty>=0.0.17",
-    "poethepoet>=0.32.0",
 ]
 
 [build-system]
@@ -63,11 +62,3 @@ include = ["src", "scripts", "tests"]
 [tool.ty.terminal]
 # Treat warning-level diagnostics as failures, approximating a "strict" policy.
 error-on-warning = true
-
-[tool.poe.tasks]
-exp = "python scripts/run_experiment.py"
-check = "ruff check --fix src scripts tests"
-format = "ruff format src scripts tests"
-lint = ["format", "check"]
-typecheck = "ty check src scripts tests"
-test = "pytest"

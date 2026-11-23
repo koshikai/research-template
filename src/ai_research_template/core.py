@@ -57,33 +57,3 @@ class LinearModel:
             Predicted values as an array of shape (n_samples,).
         """
         return self.slope * x + self.intercept
-
-
-class ResearchModel:
-    """A simple research model for experimental computations.
-
-    This is a placeholder model that demonstrates the basic structure
-    for research experiments.
-
-    Attributes:
-        learning_rate: The learning rate parameter for the model.
-    """
-
-    def __init__(self, learning_rate: float = 0.01) -> None:
-        """Initialize the ResearchModel.
-
-        Args:
-            learning_rate: Learning rate for the model (default: 0.01).
-        """
-        self.learning_rate = learning_rate
-
-    def run_computation(self, data: list[float]) -> float:
-        """Run a simple computation on the input data.
-
-        Args:
-            data: A list of numerical values to process.
-
-        Returns:
-            The sum of data multiplied by the learning rate.
-        """
-        return sum(data) * self.learning_rate
