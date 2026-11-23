@@ -72,3 +72,4 @@ uv run poe edit
 - [PDCA Execution](docs/pdca_execution.md)
 - [Collaboration Guide](docs/ai_collaboration.md)
 - [Template Usage Guide](docs/template_guide.md) (新規プロジェクト作成時はこちら)
+- [研究ラインの登録と更新](docs/template_guide.md#5-研究ラインを登録する)
