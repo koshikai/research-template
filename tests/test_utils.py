@@ -4,24 +4,15 @@ import json
 import tempfile
 from pathlib import Path
 
-import yaml
+import pytest
 
-from ai_research_template.utils import load_config, save_results, setup_logger
-
-
-def test_load_config():
-    """Test loading a YAML configuration file."""
-    with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
-        config = {"n_samples": 100, "learning_rate": 0.01}
-        yaml.dump(config, f)
-        f.flush()
-
-        loaded = load_config(f.name)
-
-        assert loaded["n_samples"] == 100
-        assert loaded["learning_rate"] == 0.01
-
-    Path(f.name).unlink()
+from ai_research_template.utils import (
+    complete_run,
+    prepare_output_dir,
+    save_params,
+    save_results,
+    setup_logger,
+)
 
 
 def test_save_results():
@@ -52,3 +43,36 @@ def test_setup_logger():
         assert (output_dir / "logs" / "experiment.log").exists()
 
         logger.info("Test message")
+
+
+def test_run_completion_keeps_incomplete_runs_out_of_latest(tmp_path: Path) -> None:
+    timestamp = "2026-01-01_000000"
+    completed = prepare_output_dir("sample", tmp_path, timestamp)
+    incomplete = prepare_output_dir("sample", tmp_path, timestamp)
+
+    assert incomplete != completed
+    assert not (tmp_path / "latest").exists()
+
+    save_params({}, completed)
+    save_results({}, completed)
+    complete_run(completed, {"git_commit": "example"})
+    manifest = json.loads((completed / "manifest.json").read_text())
+    assert manifest["run_id"] == completed.name
+    assert manifest["git_commit"] == "example"
+    assert (tmp_path / "latest").resolve() == completed
+    assert (tmp_path / "sample/latest").resolve() == completed
+    assert not (incomplete / "manifest.json").exists()
+
+    save_params({}, incomplete)
+    with pytest.raises(FileNotFoundError):
+        complete_run(incomplete, {"git_commit": "example"})
+    assert (tmp_path / "latest").resolve() == completed
+    assert not (incomplete / "manifest.json").exists()
+
+    save_results({}, incomplete)
+    complete_run(incomplete, {"git_commit": "example"})
+    with pytest.raises(FileExistsError):
+        complete_run(completed, {"git_commit": "changed"})
+    assert json.loads((completed / "manifest.json").read_text()) == manifest
+    assert (tmp_path / "latest").resolve() == incomplete
+    assert (completed / "manifest.json").exists()

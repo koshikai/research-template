@@ -9,9 +9,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.13"]
 
     steps:
       - uses: actions/checkout@v4
@@ -20,16 +17,18 @@ jobs:
         uses: astral-sh/setup-uv@v5
 
       - name: Set up Python ${{ matrix.python-version }}
-        run: uv python install ${{ matrix.python-version }}
+        run: uv python install
 
       - name: Install dependencies
-        run: uv sync --all-groups
+        run: uv sync --locked
 
       - name: Run Linter & Formatter Check
-        run: uv run poe lint
+        run: |
+          uv run --locked ruff format --check src scripts tests
+          uv run --locked ruff check src scripts tests
 
       - name: Run Type Check
-        run: uv run poe typecheck
+        run: uv run --locked ty check
 
       - name: Run Tests
-        run: uv run poe test
+        run: uv run --locked pytest

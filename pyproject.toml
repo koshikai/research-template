@@ -5,26 +5,13 @@ description = "AI-driven research template powered by Astral tools"
 readme = "README.md"
 authors = [{ name = "kaito" }]
 requires-python = ">=3.13,<3.14"
-dependencies = [
-    "numpy>=2.0.0",
-    "pandas>=2.0.0",
-    "matplotlib>=3.9.0",
-    "pyyaml>=6.0.0",
-    "pydantic>=2.0.0",
-    "tqdm>=4.66.0",
-    "pymupdf4llm>=0.2.9",
-    "pymupdf>=1.23.0",
-]
+dependencies = []
 
 [dependency-groups]
 dev = [
     "pytest>=8.0.0",
-    "ipykernel>=6.29.0",
     "ruff>=0.9.0",
-    "marimo>=0.10.0",
-    "playwright>=1.40.0",
     "ty>=0.0.17",
-    "poethepoet>=0.32.0",
 ]
 
 [build-system]
@@ -67,27 +54,8 @@ indent-style = "space"
 python-version = "3.13"
 
 [tool.ty.src]
-# notebooks/ は marimo 形式のため ty がクラッシュする問題を回避
 include = ["src", "scripts", "tests"]
 
 [tool.ty.terminal]
 # Treat warning-level diagnostics as failures, approximating a "strict" policy.
 error-on-warning = true
-
-[tool.poe.tasks]
-exp = "python scripts/run_experiment.py"
-edit = "python -m marimo edit ${MARIMO_NOTEBOOK:-notebooks/analysis_sample.py}"
-app = "python -m marimo run ${MARIMO_NOTEBOOK:-notebooks/analysis_sample.py} --headless"
-ui-check = "python scripts/marimo_ui_check.py"
-paper = "python scripts/convert_papers.py"
-pdf2img = "python scripts/pdf_to_images.py"
-daily-report = "python scripts/daily_report.py"
-check = "ruff check --fix src scripts tests"
-format = "ruff format src scripts tests"
-lint = ["format", "check"]
-typecheck = "ty check src scripts tests"
-test = "pytest"
-tex-sotsuron = "latexmk -cd -output-directory=out tex/sotsuron/main.tex"
-tex-zemi = "latexmk -cd -output-directory=out tex/zemi/main.tex"
-tex-handout = "latexmk -cd -output-directory=out tex/handout/main.tex"
-tex-clean = "latexmk -C -output-directory=out tex/sotsuron/main.tex tex/zemi/main.tex tex/handout/main.tex"

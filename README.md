@@ -1,74 +1,31 @@
-# AI-Driven Research Template
+# 研究プロジェクトテンプレート
 
-AIエージェント（Antigravity等）と協調して研究を極限まで高速化するためのPythonプロジェクトテンプレートです。
+GitHub の Use this template でリポジトリを作成し、クローン先で次を実行します。手順には Python と uv が必要です。
 
-## 特徴
-- **Astral Stack**: `uv`, `ruff`, `ty` を用いた超高速開発サイクル
-- **Reactive Analysis**: `marimo` によるコードと出力が常に一致するノートブック環境
-- **Task Automation**: `poethepoet` による実験・分析コマンドの短縮化
-- **AI-Native**: エージェントがコンテキストを把握しやすいディレクトリ構造と命名規則
-- **自律型PDCA**: CLI実行と成果物（`outputs/`）の自動検証を前提としたワークフロー
-- **スキル拡張**: `.agent/skills/` による専門能力のモジュール化
-
-## ディレクトリ構造
-詳細は [architecture.md](docs/architecture.md) を参照してください。
-
-- `src/`: 研究ロジック（不変な部品、コアアルゴリズム）
-- `scripts/`: 実験実行エントリーポイント（CLIから叩く薄いラッパー）
-- `configs/`: 実験パラメータ
-- `outputs/`: 実験結果、ログ、プロット（エージェントが評価する場所）
-- `.agent/skills/`: エージェントの追加能力（指示セット・スクリプト）
-
-> [!IMPORTANT]
-> **使用開始前の必須手順**  
-> 本リポジトリをテンプレートとして使用し開発を始める際は、まず最初に以下のコマンドでプロジェクト名を適切な名前（例: `my_project`）にリネームしてください。
-> ```bash
-> uv run scripts/rename_project.py my_project
-> uv sync
-> ```
-> デフォルトの `ai_research_template` のままモジュールを使用すると、警告（`UserWarning`）が発生します。
-
-## クイックスタート
-
-### 1. 環境構築
 ```bash
-# uvがインストールされている必要があります
-uv sync
+uv run --no-project python scripts/rename_project.py my_research
+uv sync --locked
+uv run --locked pytest
 ```
 
-### 2. コード品質チェック
-```bash
-# Linter / Formatter / Typcheckを一括実行
-uv run poe lint
-uv run poe typecheck
-```
+`my_research` はプロジェクトに合わせて変更します。初期設定が済んだら、この README に研究の目的とラインカードへのリンクを置きます。
 
-### 3. 実験の実行
-```bash
-# サンプル実験を実行
-uv run poe exp
-```
+## 研究ライン
 
-### 4. 分析（marimo）
-```bash
-# ノートブックをアプリとして表示
-uv run poe app
+[ラインカード](docs/templates/research-line.md)を `docs/lines/<line-id>.md` にコピーします。複数のリポジトリを使うラインでは、カードを置く場所を一つに決め、各 README から同じカードにリンクします。次の作業や状態を決めたときに、カードの更新日と判断へのリンクを更新します。
 
-# ノートブックを編集モードで開く
-uv run poe edit
-```
-※ `MARIMO_NOTEBOOK` 環境変数で対象ノートブックを切り替えできます。
+| 記録 | 置き場 |
+| --- | --- |
+| 研究計画と結果 | [ひな形](docs/templates/study.md)を `docs/studies/` にコピー |
+| 方針と判断理由 | [ひな形](docs/templates/decision.md)を `docs/decisions/` にコピー |
+| 実験設定と実装 | 設定は `configs/`、実装は [src/](src/)、実行 CLI は [scripts/](scripts/) に追加 |
 
-## AIエージェント（Antigravity/Cursor）への指示
-- **型ヒント**: 新機能の追加時には必ず `Strict` な型ヒントを付けてください。
-- **PDCA**: 実験後は `outputs/` の結果を確認し、自律的に改善案（Act）を提示してください。
-- **marimo検証**: ノートブック作成/更新後は `uv run --group dev poe ui-check -- --notebook notebooks/your_notebook.py` でWeb UIエラーまで確認してください。
-- **計画**: 大規模な変更の前には `implementation_plan.md` を作成してユーザーと合意してください。
+## 実験
 
-## ドキュメント
-運用ルールの詳細は `docs/` 配下を参照してください：
-- [Overview](docs/overview.md)
-- [Architecture](docs/architecture.md)
-- [PDCA Execution](docs/pdca_execution.md)
-- [Collaboration Guide](docs/ai_collaboration.md)
-- [Template Usage Guide](docs/template_guide.md) (新規プロジェクト作成時はこちら)
+1. 実行前に、問い、比較対象、指標、判断基準を研究計画に書きます。
+2. 実験ごとに必要な設定と実行 CLI を追加します。[run 記録用の関数](src/ai_research_template/utils.py)を使うと、出力を `outputs/<experiment>/<run_id>/` にまとめられます。
+3. 実行前に `run_provenance` で実行情報を取得します。実行後に `save_params` と `save_results` で保存し、`complete_run` で完了を記録します。報告には個別の run ID と保存先を記します。未コミットの変更がある run を引用する場合は、差分も保存します。
+
+外部の計算バックエンドを使った run では、実際に選ばれた実装と、ビルドや配布物を特定できる情報（ビルド時のコミットや wheel の SHA-256 など）を記録します。たとえば `provenance["external_dependencies"]` に入れて `complete_run` に渡すと、`manifest.json` に引き継がれます。
+
+`outputs/` は Git の追跡対象外です。共有が必要な成果物の保管先は、研究報告に記します。再試行には別の run ID を使います。
