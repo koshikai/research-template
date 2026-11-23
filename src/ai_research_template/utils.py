@@ -54,7 +54,7 @@ def prepare_output_dir(
         artifacts/
         metrics.json
         params.json
-        report.md
+        manifest.json
     """
     output_root_path = Path(output_root)
     exp_root = output_root_path / experiment_name
@@ -202,78 +202,3 @@ def save_params(params: dict[str, Any], output_dir: Path) -> None:
     """Save experiment parameters as a JSON file."""
     with open(output_dir / "params.json", "w", encoding="utf-8") as f:
         json.dump(params, f, indent=4)
-
-
-def write_report(lines: list[str], output_dir: Path) -> None:
-    """Write a plain-text markdown report."""
-    report_path = output_dir / "report.md"
-    report_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
-
-
-def write_daily_report_request(
-    output_dir: Path,
-    experiment_name: str,
-    timestamp: str,
-    config_path: str | None,
-    metrics: dict[str, Any] | None = None,
-) -> Path:
-    """Write a request file for an AI-authored daily report.
-
-    The request includes paths and metadata needed to draft the daily log entry.
-    """
-    request = {
-        "timestamp": timestamp,
-        "experiment_name": experiment_name,
-        "output_dir": str(output_dir),
-        "report_path": str(output_dir / "report.md"),
-        "params_path": str(output_dir / "params.json"),
-        "metrics_path": str(output_dir / "metrics.json"),
-        "config_path": config_path,
-        "metrics": metrics or {},
-    }
-    request_path = output_dir / "report_request.json"
-    with request_path.open("w", encoding="utf-8") as f:
-        json.dump(request, f, indent=2)
-
-    prompt_path = output_dir / "report_request.md"
-    prompt_lines = [
-        "# Daily Report Request",
-        "",
-        f"- Timestamp: {timestamp}",
-        f"- Experiment: {experiment_name}",
-        f"- Output: {output_dir}",
-        f"- Report: {output_dir / 'report.md'}",
-        f"- Params: {output_dir / 'params.json'}",
-        f"- Metrics: {output_dir / 'metrics.json'}",
-        f"- Config: {config_path or 'n/a'}",
-        "",
-        "Next step:",
-        f"- Run: uv run poe daily-report --request {request_path}",
-    ]
-    prompt_path.write_text("\n".join(prompt_lines) + "\n", encoding="utf-8")
-
-    return request_path
-
-
-def append_daily_log(entry_lines: list[str], log_date: str | None = None) -> Path:
-    """Append an entry to a date-based research log in docs/experiments.
-
-    Args:
-        entry_lines: Markdown lines describing the experiment outcome.
-        log_date: Date string in YYYY-MM-DD format (default: today).
-
-    Returns:
-        The path to the log file that was written.
-    """
-    date_str = log_date or datetime.now().strftime("%Y-%m-%d")
-    logs_dir = Path("docs/experiments")
-    logs_dir.mkdir(parents=True, exist_ok=True)
-    log_path = logs_dir / f"{date_str}.md"
-
-    if not log_path.exists():
-        log_path.write_text(f"# {date_str}\n\n", encoding="utf-8")
-
-    with log_path.open("a", encoding="utf-8") as f:
-        f.write("\n".join(entry_lines).rstrip() + "\n\n")
-
-    return log_path
