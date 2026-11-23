@@ -10,17 +10,6 @@ Main modules:
     - utils: Configuration, logging, and result management
 """
 
-import warnings
-
-if __package__ == "ai_research_template":
-    warnings.warn(
-        "You are using the default package name 'ai_research_template'. "
-        "It is highly recommended to rename your project using:\n"
-        "  uv run scripts/rename_project.py <new_name>",
-        UserWarning,
-        stacklevel=2,
-    )
-
 from ai_research_template.core import LinearModel, ResearchModel
 from ai_research_template.data import generate_linear_data
 from ai_research_template.metrics import (
