@@ -4,30 +4,12 @@ import json
 import tempfile
 from pathlib import Path
 
-import yaml
-
 from ai_research_template.utils import (
     complete_run,
-    load_config,
     prepare_output_dir,
     save_results,
     setup_logger,
 )
-
-
-def test_load_config():
-    """Test loading a YAML configuration file."""
-    with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
-        config = {"n_samples": 100, "learning_rate": 0.01}
-        yaml.dump(config, f)
-        f.flush()
-
-        loaded = load_config(f.name)
-
-        assert loaded["n_samples"] == 100
-        assert loaded["learning_rate"] == 0.01
-
-    Path(f.name).unlink()
 
 
 def test_save_results():

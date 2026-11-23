@@ -1,7 +1,6 @@
 """Utility functions for experiment management.
 
 This module provides helper functions for:
-- Configuration loading (YAML files)
 - Logging setup (file and console output)
 - Result saving (JSON format)
 """
@@ -16,8 +15,6 @@ from hashlib import sha256
 from pathlib import Path
 from typing import Any
 from uuid import uuid4
-
-import yaml
 
 
 def current_timestamp() -> str:
@@ -155,28 +152,6 @@ def complete_run(output_dir: Path, provenance: dict[str, Any]) -> None:
     pending.replace(output_dir / "manifest.json")
     update_latest_symlink(output_dir.parent / "latest", output_dir)
     update_latest_symlink(output_dir.parent.parent / "latest", output_dir)
-
-
-def load_config(config_path: str | Path) -> dict[str, Any]:
-    """Load configuration from a YAML file.
-
-    Args:
-        config_path: Path to the YAML configuration file.
-
-    Returns:
-        Dictionary containing the configuration parameters.
-
-    Raises:
-        FileNotFoundError: If the config file does not exist.
-        yaml.YAMLError: If the file contains invalid YAML.
-
-    Example:
-        >>> config = load_config("configs/sample.yaml")
-        >>> config["n_samples"]
-        200
-    """
-    with open(config_path, encoding="utf-8") as f:
-        return yaml.safe_load(f)
 
 
 def save_results(results: dict[str, Any], output_dir: Path) -> None:
